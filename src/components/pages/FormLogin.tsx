@@ -9,20 +9,39 @@ import { useAuth } from '@/context/AuthContext'
 import { useForm } from 'react-hook-form'
 import { loginValidator, LoginValidator } from '@/utils/validator/loginValidator'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { withSwal } from 'react-sweetalert2'
 
-const FormLogin = () => {
+const FormLogin = withSwal((props: any) => {
     const { isDark } = useTheme()
     const router = useRouter()
     const { createUser } = useAuth()
+    const { swal } = props;
 
     const { register, handleSubmit, formState } = useForm<LoginValidator>({
         resolver: zodResolver(loginValidator)
     })
 
+    const Toast = swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast: any) => {
+            toast.addEventListener('mouseenter', swal.stopTimer)
+            toast.addEventListener('mouseleave', swal.resumeTimer)
+        },
+        didClose: () => {
+            router.push('/todo')
+        }
+    })
+
     const handleLogin = handleSubmit((values) => {
         createUser(values.username, values.password)
-        router.push('/todo')
-        alert('username : ' + values.username + ' password : ' + values.password)
+        Toast.fire({
+            icon: 'success',
+            title: `Login Success ${values.username}`,
+        })
     })
 
     return (
@@ -50,6 +69,6 @@ const FormLogin = () => {
             </Card>
         </form>
     )
-}
+})
 
 export default FormLogin
