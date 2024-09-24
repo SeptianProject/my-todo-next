@@ -10,10 +10,13 @@ const page = () => {
         <div>
             <h1>Todo Page</h1>
             {
-                users.map((user: any) => {
-                    <div>
-                        <h1>Username {user.username}</h1>
-                    </div>
+                users.map((user: any, index: number) => {
+                    return (
+                        <div key={index}>
+                            <h3>{user.username}</h3>
+                            <p>{user.password}</p>
+                        </div>
+                    )
                 })
             }
         </div>

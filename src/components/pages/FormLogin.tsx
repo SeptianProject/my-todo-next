@@ -14,7 +14,7 @@ import { withSwal } from 'react-sweetalert2'
 const FormLogin = withSwal((props: any) => {
     const { isDark } = useTheme()
     const router = useRouter()
-    const { createUser } = useAuth()
+    const { loginUser } = useAuth()
     const { swal } = props;
 
     const { register, handleSubmit, formState } = useForm<LoginValidator>({
@@ -31,17 +31,27 @@ const FormLogin = withSwal((props: any) => {
             toast.addEventListener('mouseenter', swal.stopTimer)
             toast.addEventListener('mouseleave', swal.resumeTimer)
         },
-        didClose: () => {
-            router.push('/todo')
-        }
     })
 
     const handleLogin = handleSubmit((values) => {
-        createUser(values.username, values.password)
-        Toast.fire({
-            icon: 'success',
-            title: `Login Success ${values.username}`,
-        })
+        try {
+            loginUser(values.username, values.password)
+            Toast.fire({
+                icon: 'success',
+                title: `Login Success ${values.username}`,
+                didClose: () => {
+                    router.push('/todo')
+                }
+            })
+        } catch (error) {
+            Toast.fire({
+                icon: 'error',
+                title: `Invalid credentials`,
+                didClose: () => {
+                    router.push('/')
+                }
+            })
+        }
     })
 
     return (
@@ -51,8 +61,8 @@ const FormLogin = withSwal((props: any) => {
                 <FormFieldLayout
                     theme={isDark}
                     rest={{
-                        username: register('username'),
-                        password: register('password')
+                        username: { ...register('username') },
+                        password: { ...register('password') }
                     }}
                     error={{
                         username: formState.errors.username,
